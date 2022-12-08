@@ -36,7 +36,9 @@ ENV PATH=$PATH:$PNPM_HOME
 # Configure a nice terminal
 RUN echo "export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '" >> /home/$USERNAME/.bashrc && \
 # Fake poweroff (stops the container from the inside by sending SIGHUP to PID 1)
-    echo "alias poweroff='kill -1 1'" >> /home/$USERNAME/.bashrc
+    echo "alias poweroff='kill -1 1'" >> /home/$USERNAME/.bashrc && \
+    echo "export PNPM_HOME='/home/coder/.local/share/pnpm'" >> /home/$USERNAME/.bashrc && \
+    echo "export PATH='$PNPM_HOME:$PATH'" >> /home/$USERNAME/.bashrc
 
 WORKDIR /home/$USERNAME
 ENTRYPOINT ["/sbin/tini", "--"]
