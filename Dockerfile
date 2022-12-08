@@ -31,7 +31,7 @@ USER $USERNAME
 ENV PNPM_HOME=/home/$USERNAME/.local/share/pnpm
 
 ENV PATH=$PATH:$PNPM_HOME
-RUN pnpm setup
+# RUN pnpm setup
 
 # Configure a nice terminal
 RUN echo "export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '" >> /home/$USERNAME/.bashrc && \
