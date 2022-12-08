@@ -10,11 +10,11 @@ RUN apk --no-cache add sudo tini shadow bash \
 #   npm=9.1.2-r0
  
 ARG USERNAME=coder
-ARG USER_UID=1000
+ARG USER_UID=1001
 ARG USER_GID=$USER_UID
 
 # Add group and user # addgroup $USERNAME -g $USER_GID && \
-RUN adduser -G $USERNAME -u $USER_UID -s /bin/bash -D $USERNAME && \
+RUN adduser -G node -u $USER_UID -s /bin/bash -D $USERNAME && \
     echo $USERNAME ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/nopasswd
 
 # Change user
