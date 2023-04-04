@@ -1,45 +1,43 @@
-FROM node:16.3.0-alpine
-# Installs
-# Installs shell related tools
-RUN apk --no-cache add sudo tini shadow bash \
-# Installs compatibility libs
-  gcompat libc6-compat libgcc libstdc++ \
-# Installs some basic tools
-  git curl socat openssh-client nano unzip brotli zstd xz
-# Installs node and npm
-#   npm=9.1.2-r0
+# Ubuntu 22.04 + SSL
+# Uncomment SSL lines if SSL configuration is needed
 
- # Add PNPM
-ARG PNPM_VERSION=7.18.1
-ENV PNPM_HOME=/root/.local/share/pnpm
-ENV PATH=$PATH:$PNPM_HOME
-RUN apk add --no-cache curl && \
-  curl -fsSL "https://github.com/pnpm/pnpm/releases/download/v${PNPM_VERSION}/pnpm-linuxstatic-arm64" -o /bin/pnpm && chmod +x /bin/pnpm && \
-  apk del curl
-  
-ARG USERNAME=coder
-ARG USER_UID=1001
-ARG USER_GID=$USER_UID
+FROM ubuntu:22.04
+#MAINTAINER Sergei Ovchinnikov (https://wmspanel.com/help)
+LABEL	description="Nimble Streamer with SRT"
 
-# Add group and user # addgroup $USERNAME -g $USER_GID && \
-RUN adduser -G node -u $USER_UID -s /bin/bash -D $USERNAME && \
-    echo $USERNAME ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/nopasswd
+RUN	apt-get update -y
+RUN	apt-get install wget gnupg sudo vim less -y
 
-# Change user
-USER $USERNAME
+ENV	TZ=Asia/Vladivostok
+RUN	ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV PNPM_HOME=/home/$USERNAME/.local/share/pnpm
+RUN	sudo bash -c 'echo -e "deb http://nimblestreamer.com/ubuntu jammy/" > /etc/apt/sources.list.d/nimble.list'
+RUN	wget -q -O - http://nimblestreamer.com/gpg.key | sudo tee /etc/apt/trusted.gpg.d/nimble.asc
+RUN	apt-get update -y
 
-ENV PATH=$PATH:$PNPM_HOME
-# RUN pnpm setup
+RUN	apt-get install nimble nimble-srt-1.5 -y
 
-# Configure a nice terminal
-RUN echo "export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '" >> /home/$USERNAME/.bashrc && \
-# Fake poweroff (stops the container from the inside by sending SIGHUP to PID 1)
-    echo "alias poweroff='kill -1 1'" >> /home/$USERNAME/.bashrc && \
-    echo "export PNPM_HOME='/home/coder/.local/share/pnpm'" >> /home/$USERNAME/.bashrc && \
-    echo "export PATH='$PNPM_HOME:$PATH'" >> /home/$USERNAME/.bashrc
 
-WORKDIR /home/$USERNAME
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/bin/bash"]
+# Fill in variables for Nimble Server name, WMSPanel account and password below
+ARG	WMSPANEL_SERVER_NAME=SRT-Ubuntu_22.04
+ARG	WMSPANEL_ACCOUNT=kekave9641@fectode.com
+ARG	WMSPANEL_PASS=KI0Tt+TnUC8
+
+RUN	sudo /usr/bin/nimble_regutil -u $WMSPANEL_ACCOUNT -p $WMSPANEL_PASS --server-name $WMSPANEL_SERVER_NAME --host nimble.wmspanel.com
+RUN	sudo echo "management_listen_interfaces = *" >> /etc/nimble/nimble.conf 
+
+## Uncomment for SSL config
+# Place SSL certificate files to the same directory as Dockerfile and fill its file names in respective variables
+#ARG	NIMBLE_SSL_CERT=
+#ARG	NIMBLE_SSL_KEY=
+
+#ADD 	$NIMBLE_SSL_CERT /etc/nimble
+#ADD 	$NIMBLE_SSL_KEY /etc/nimble
+#RUN	sudo echo "ssl_port = 443" >> /etc/nimble/nimble.conf 
+#RUN	sudo echo "ssl_certificate = /etc/nimble/$NIMBLE_SSL_CERT" >> /etc/nimble/nimble.conf 
+#RUN	sudo echo "ssl_certificate_key = /etc/nimble/$NIMBLE_SSL_KEY" >> /etc/nimble/nimble.conf 
+#RUN	sudo echo "ssl_http2_enabled = true" >> /etc/nimble/nimble.conf 
+##
+
+EXPOSE 8081 1935 554 443 4444/udp
+ENTRYPOINT	["/usr/bin/nimble", "--conf-dir=/etc/nimble", "--log-dir=/var/log/nimble","--pidfile=/var/run/nimble.pid"]
