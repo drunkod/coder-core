@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Сделать nimble user владельцем директории файлов логов
+mkdir -p /var/log/nimble
+chown -R nimble:root /var/log/nimble
+
+# Сделать nimble user владельцем файла rules.conf
+if [ -f /etc/nimble/rules.conf ]; then
+    chown -R nimble:root /etc/nimble/rules.conf
+    chmod 664 /etc/nimble/rules.conf
+fi
+
+# Пересоздать директорию для для отображения процесса
+# сервера nimble в pidfile
+mkdir -p /var/run/nimble
+chown -R nimble:root /var/run/nimble
+chmod 775 /var/run/nimble
+
+# Назначить максимальное количество файловых потоков
+ulimit -n 50000
+
+ARGS="--conf-dir=/etc/nimble --log-dir=/var/log/nimble --pidfile=/var/run/nimble/nimble.pid"
+
+# Запустить service от имени nimble user
+exec /sbin/setuser nimble /usr/bin/nimble $ARGS

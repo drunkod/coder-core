@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+# Даже если конфигурационного файла ещё не существует, попробовать зарегистрировать сервер
+if ! [ -f /etc/nimble/nimble.conf ]; then
+
+    # Нужны имя пользователя и пароль для регистрации
+    if ! [ -z "$WMSPANEL_USER" ]; then
+
+        cp -fr /etc/nimble.conf/* /etc/nimble
+        ARGS=""
+        if ! [ -z "$WMSPANEL_SLICES" ]; then
+            ARGS="--slices=$WMSPANEL_SLICES"
+        fi
+
+        # Попробовать зарегистрироваться с имеющимися данными
+        if ! /usr/bin/nimble_regutil $ARGS --aply-rules-conf \
+             -u "$WMSPANEL_USER" -p "$WMSPANEL_PASS"; then
+            # Попробовать без введённых данных
+            if ! /usr/bin/nimble_regutil $ARGS --aply-rules-conf \
+                 -u "$WMSPANEL_USER" -p "$WMSPANEL_PASS"; then
+                # Если регистрация не принята, удалить config
+                rm -f /etc/nimble/nimble.conf
+            fi
+        fi
+    fi
+fi
+    
+chown -R nimble:root /etc/nimble
+chown -R nimble:root /var/cache/nimble
+rm -f /etc/nimble/run_as_root

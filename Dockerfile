@@ -1,43 +1,43 @@
-# Ubuntu 22.04 + SSL
-# Uncomment SSL lines if SSL configuration is needed
-
-FROM ubuntu:22.04
-#MAINTAINER Sergei Ovchinnikov (https://wmspanel.com/help)
-LABEL	description="Nimble Streamer with SRT"
-
-RUN	apt-get update -y
-RUN	apt-get install wget gnupg sudo vim less -y
-
-ENV	TZ=Asia/Vladivostok
-RUN	ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-RUN	sudo bash -c 'echo -e "deb http://nimblestreamer.com/ubuntu jammy/" > /etc/apt/sources.list.d/nimble.list'
-RUN	wget -q -O - http://nimblestreamer.com/gpg.key | sudo tee /etc/apt/trusted.gpg.d/nimble.asc
-RUN	apt-get update -y
-
-RUN	apt-get install nimble nimble-srt-1.5 -y
+FROM debian:buster
+#MAINTAINER Mitry Pyostrovsky <mitrypyostrovsky@gmail.com>
 
 
-# Fill in variables for Nimble Server name, WMSPanel account and password below
-ARG	WMSPANEL_SERVER_NAME=SRT-Ubuntu_22.04
-ARG	WMSPANEL_ACCOUNT=
-ARG	WMSPANEL_PASS=
+ENV DEBIAN_FRONTEND=noninteractive
+# Update packages and install necessary utilities
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils \
+    && apt-get upgrade -y \
+    && apt-get install -y wget locales gnupg dirmngr \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-#RUN	sudo /usr/bin/nimble_regutil -u $WMSPANEL_ACCOUNT -p $WMSPANEL_PASS --server-name $WMSPANEL_SERVER_NAME --host nimble.wmspanel.com
-RUN	sudo echo "management_listen_interfaces = *" >> /etc/nimble/nimble.conf 
+# Install Nimble Streaming Server and move configuration files
+RUN echo "deb http://nimblestreamer.com/debian/ buster/" > /etc/apt/sources.list.d/nimblestreamer.list \
+    && wget -q -O - http://nimblestreamer.com/gpg.key | apt-key add - \
+    && apt-get update \
+    && apt-get install -y nimble \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && mkdir /etc/nimble.conf \
+    && mv /etc/nimble/* /etc/nimble.conf
 
-## Uncomment for SSL config
-# Place SSL certificate files to the same directory as Dockerfile and fill its file names in respective variables
-#ARG	NIMBLE_SSL_CERT=
-#ARG	NIMBLE_SSL_KEY=
+# Create volumes for configuration and cache files
+VOLUME /etc/nimble
+VOLUME /var/cache/nimble
 
-#ADD 	$NIMBLE_SSL_CERT /etc/nimble
-#ADD 	$NIMBLE_SSL_KEY /etc/nimble
-#RUN	sudo echo "ssl_port = 443" >> /etc/nimble/nimble.conf 
-#RUN	sudo echo "ssl_certificate = /etc/nimble/$NIMBLE_SSL_CERT" >> /etc/nimble/nimble.conf 
-#RUN	sudo echo "ssl_certificate_key = /etc/nimble/$NIMBLE_SSL_KEY" >> /etc/nimble/nimble.conf 
-#RUN	sudo echo "ssl_http2_enabled = true" >> /etc/nimble/nimble.conf 
-##
+# Set environment variables for WMS-panel (if needed)
+ ENV WMSPANEL_USER   "drunkod@gmail.com"
+ ENV WMSPANEL_PASS   "AJzd8TTgBjw"
+ ENV WMSPANEL_SLICES ""
 
-EXPOSE 8081 1935 554 443 4444/udp
-ENTRYPOINT	["/usr/bin/nimble", "--conf-dir=/etc/nimble", "--log-dir=/var/log/nimble","--pidfile=/var/run/nimble.pid"]
+# Copy configuration files into container
+COPY files/my_init.d /etc/my_init.d
+COPY files/service /etc/service
+COPY files/logrotate.d /etc/logrotate.d
+
+# Expose ports for streaming
+EXPOSE 1935 8081
+
+# Set command to start Nimble Streaming Server
+#CMD bash -c "service nimble start && tail -f /dev/null"
+CMD ["/bin/bash"]
+
