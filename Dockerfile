@@ -20,10 +20,10 @@ RUN	apt-get install nimble nimble-srt-1.5 -y
 
 # Fill in variables for Nimble Server name, WMSPanel account and password below
 ARG	WMSPANEL_SERVER_NAME=SRT-Ubuntu_22.04
-ARG	WMSPANEL_ACCOUNT=
-ARG	WMSPANEL_PASS=
+ARG	WMSPANEL_ACCOUNT=kekave9641@fectode.com
+ARG	WMSPANEL_PASS=KI0Tt+TnUC8
 
-#RUN	sudo /usr/bin/nimble_regutil -u $WMSPANEL_ACCOUNT -p $WMSPANEL_PASS --server-name $WMSPANEL_SERVER_NAME --host nimble.wmspanel.com
+RUN	sudo /usr/bin/nimble_regutil -u $WMSPANEL_ACCOUNT -p $WMSPANEL_PASS --server-name $WMSPANEL_SERVER_NAME --host nimble.wmspanel.com
 RUN	sudo echo "management_listen_interfaces = *" >> /etc/nimble/nimble.conf 
 
 ## Uncomment for SSL config
