@@ -1,4 +1,5 @@
-FROM jrottenberg/ffmpeg:6.0-alpine
+
+FROM datarhei/restreamer:latest
 # Installs
 # Installs shell related tools
 RUN apk --no-cache add sudo tini shadow bash \
