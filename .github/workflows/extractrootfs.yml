@@ -13,5 +13,5 @@ jobs:
       - name: 'Extract rootfs'
         uses: ./
         with:
-          image_name: 'ubuntu'
-          output_file: 'ubuntu-rootfs'
+          image_name: 'ghcr.io/drunkod/coder-core:master'
+          output_file: 'master-rootfs'
