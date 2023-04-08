@@ -16,8 +16,8 @@ runs:
       run: |
         #!/bin/bash
         # Assign the arguments to variables
-        image_name=$image_name
-        output_file=$output_file
+        image_name=${{ env.IMAGE_NAME }}
+        output_file=${{ env.OUTPUT_FILE }}
 
         # Create a temporary container from the image
         container_id=$(docker create $image_name)
