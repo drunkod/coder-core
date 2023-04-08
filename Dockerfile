@@ -1,5 +1,126 @@
-FROM jrottenberg/ffmpeg:6.0-alpine
-# FROM martinussuherman/alpine:3.13-arm64v8-glibc
+ARG BUILD_IMAGE=alpine:3.17
+
+FROM $BUILD_IMAGE as builder
+
+ARG FREETYPE_VERSION=2.11.1-r2
+ARG XML2_VERSION=2.9.14-r0
+ARG SRT_VERSION=1.4.2-r1
+ARG X264_VERSION=20210613-r0
+ARG X265_VERSION=3.5-r0
+ARG VPX_VERSION=1.10.0-r0
+ARG LAME_VERSION=3.100-r0
+ARG OPUS_VERSION=1.3.1-r1
+ARG VORBIS_VERSION=1.3.7-r0
+ARG FBDEV_VERSION=0.5.0-r3
+ARG V4L_VERSION=1.22.1-r1
+ARG FFMPEG_VERSION=4.4.2
+
+ENV PKG_CONFIG_PATH=/usr/lib/pkgconfig \
+  SRC=/usr
+
+# install build packages
+RUN apk add --update \
+  autoconf \
+  automake \
+  bash \
+  binutils \
+  bzip2 \
+  ca-certificates \
+  cmake \
+  coreutils \
+  curl \
+  diffutils \
+  g++ \
+  gcc \
+  libgcc \
+  libssl1.1 \
+  libtool \
+  linux-headers \
+  make \
+  musl-dev \
+  nasm \
+  openssl-dev \
+  patch \
+  tar \
+  zlib-dev
+
+# install shared ffmpeg libs
+RUN apk add -U \
+  freetype-dev=${FREETYPE_VERSION} \
+  libxml2-dev=${XML2_VERSION} \
+  libsrt-dev=${SRT_VERSION} \
+  x264-dev=${X264_VERSION} \
+  x265-dev=${X265_VERSION} \
+  libvpx-dev=${VPX_VERSION} \
+  lame-dev=${LAME_VERSION} \
+  opus-dev=${OPUS_VERSION} \
+  libvorbis-dev=${VORBIS_VERSION} \
+  v4l-utils-dev=${V4L_VERSION}
+
+# install and patch ffmpeg
+RUN mkdir -p /dist && cd /dist && \
+  curl -OLk http://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.gz && \
+  tar -xvz -f ffmpeg-${FFMPEG_VERSION}.tar.gz && \
+  rm ffmpeg-${FFMPEG_VERSION}.tar.gz
+
+COPY ./contrib /contrib
+
+RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
+  patch -p1 < /contrib/ffmpeg-jsonstats.patch && \
+  patch -p1 < /contrib/ffmpeg-hlsbitrate.patch && \
+  ./configure \
+  --extra-version=datarhei \
+  --prefix="${SRC}" \
+  --extra-libs="-lpthread -lxml2 -lm -lz -lsupc++ -lstdc++ -lssl -lcrypto -lz -lc -ldl" \
+  --enable-nonfree \
+  --enable-gpl \
+  --enable-version3 \
+  --enable-postproc \
+  --enable-static \
+  --enable-openssl \
+  --enable-libxml2 \
+  --enable-libv4l2 \
+  --enable-v4l2_m2m \
+  --enable-libfreetype \
+  --enable-libsrt \
+  --enable-libx264 \
+  --enable-libx265 \
+  --enable-libvpx \
+  --enable-libmp3lame \
+  --enable-libopus \
+  --enable-libvorbis \
+  --disable-ffplay \
+  --disable-debug \
+  --disable-doc \
+  --disable-shared && \
+  make -j$(nproc) && \
+  make install
+
+# export shared ffmpeg libs
+RUN mkdir -p /ffmpeg/lib && \
+  cp \
+  /usr/lib/libfreetype.so.6 \
+  /usr/lib/libbrotlidec.so.1 \
+  /usr/lib/libbrotlicommon.so.1 \
+  /usr/lib/libbz2.so.1 \
+  /usr/lib/libpng16.so.16 \
+  /usr/lib/libxml2.so.2 \
+  /usr/lib/liblzma.so.5 \
+  /usr/lib/libsrt.so.1.4 \
+  /usr/lib/libx264.so.163 \
+  /usr/lib/libx265.so.199 \
+  /usr/lib/libnuma.so.1 \
+  /usr/lib/libvpx.so.7 \
+  /usr/lib/libmp3lame.so.0 \
+  /usr/lib/libopus.so.0 \
+  /usr/lib/libvorbis.so.0 \
+  /usr/lib/libogg.so.0 \
+  /usr/lib/libvorbisenc.so.2 \
+  /usr/lib/libgcc_s.so.1 \
+  /usr/lib/libstdc++.so.6 \
+  /ffmpeg/lib
+
+FROM $BUILD_IMAGE as final
 
 ENV \
    # container/su-exec UID \
@@ -7,38 +128,59 @@ ENV \
    # container/su-exec GID \
    EGID=1001 \
    # container/su-exec user name \
-   EUSER=vscode \
+   EUSER=docker-user \
    # container/su-exec group name \
-   EGROUP=vscode \
-   # should user shell set to nologin? (yes/no) \
-   ENOLOGIN=no \
+   EGROUP=docker-group \
    # container user home dir \
-   EHOME=/home/vscode \
-   # code-server version \
-   VERSION=3.12.0
+   EHOME= \
+   # should user created/updated to use nologin shell? (yes/no) \
+   ENOLOGIN=yes \
+   # should user home dir get chown'ed? (yes/no) \
+   ECHOWNHOME=no \
+   # additional directories to create + chown (space separated) \
+   ECHOWNDIRS= \
+   # additional files to create + chown (space separated) \
+   ECHOWNFILES= \
+   # container timezone \
+   TZ=UTC
 
-COPY code-server /usr/bin/
-RUN chmod +x /usr/bin/code-server
-
-# Install dependencies
+# Install shadow (for usermod and groupmod) and su-exec
 RUN \
    apk --no-cache --update add \
-   bash \
-   curl \
-   git \
-   gnupg \
-   nodejs \
-   openssh-client
+   shadow \
+   su-exec \
+   tzdata
+
+COPY \
+   chown-path \
+   set-user-group-home \
+   entrypoint-crond \
+   entrypoint-exec \
+   entrypoint-su-exec \
+   /usr/bin/
 
 RUN \
-   wget https://github.com/cdr/code-server/releases/download/v$VERSION/code-server-$VERSION-linux-arm64.tar.gz && \
-   tar x -zf code-server-$VERSION-linux-arm64.tar.gz && \
-   rm code-server-$VERSION-linux-arm64.tar.gz && \
-   rm code-server-$VERSION-linux-arm64/node && \
-   rm code-server-$VERSION-linux-arm64/code-server && \
-   rm code-server-$VERSION-linux-arm64/lib/node && \
-   mv code-server-$VERSION-linux-arm64 /usr/lib/code-server && \
-   sed -i 's/"$ROOT\/lib\/node"/node/g'  /usr/lib/code-server/bin/code-server
+   chmod +x \
+   /usr/bin/chown-path \
+   /usr/bin/set-user-group-home \
+   /usr/bin/entrypoint-crond \
+   /usr/bin/entrypoint-exec \
+   /usr/bin/entrypoint-su-exec
 
-ENTRYPOINT ["entrypoint-su-exec", "code-server"]
-CMD ["--bind-addr 0.0.0.0:8080"]
+
+COPY --from=builder /usr/bin/ffmpeg /usr/bin/ffmpeg
+COPY --from=builder /ffmpeg/lib/* /usr/lib/
+
+ARG FBDEV_VERSION=0.5.0-r3
+ARG V4L_VERSION=1.22.1-r1
+
+RUN apk add --no-cache \
+  ca-certificates \
+  tzdata \
+  xf86-video-fbdev=${FBDEV_VERSION} \
+  v4l-utils=${V4L_VERSION} && \
+  ffmpeg -buildconf
+
+WORKDIR /tmp
+ENTRYPOINT ["/usr/bin/ffmpeg"]
+CMD ["-version"]
