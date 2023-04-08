@@ -1,7 +1,9 @@
 # .github/workflows/example.yml
 name: 'Example workflow'
-on: 
-  push:
+
+on:
+  workflow_dispatch:
+  
 jobs:
   extract-rootfs:
     runs-on: ubuntu-latest
