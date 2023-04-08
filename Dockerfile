@@ -125,6 +125,9 @@ RUN mkdir -p /ffmpeg/lib && \
 
 FROM $BUILD_IMAGE as final
 
+# Alpine Linux or Minimal Alpine Linux image with
+# glibc based image that bundles tzdata, su-exec, and some useful entrypoint scripts.
+# From https://github.com/martinussuherman/alpine
 ENV \
    # container/su-exec UID \
    EUID=1001 \
