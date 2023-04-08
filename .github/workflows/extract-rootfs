@@ -1,0 +1,15 @@
+# .github/workflows/example.yml
+name: 'Example workflow'
+on: 
+  push:
+jobs:
+  extract-rootfs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+      - name: 'Extract rootfs'
+        uses: ./
+        with:
+          image_name: 'ubuntu'
+          output_file: 'ubuntu-rootfs'
