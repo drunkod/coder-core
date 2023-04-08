@@ -5,6 +5,7 @@ FROM $BUILD_IMAGE as builder
 ARG FREETYPE_VERSION=2.12.1-r0
 ARG XML2_VERSION=2.10.3-r1
 ARG SRT_VERSION=1.5.1-r0
+ARG X264_L_VERSION=0.164_git20220602-r0
 ARG X264_VERSION=0.164_git20220602-r0
 ARG X265_VERSION=3.5-r3
 ARG VPX_VERSION=1.12.0-r1
@@ -49,6 +50,7 @@ RUN apk add -U \
   freetype-dev=${FREETYPE_VERSION} \
   libxml2-dev=${XML2_VERSION} \
   libsrt-dev=${SRT_VERSION} \
+  x264-libs=${X264_L_VERSION} \
   x264-dev=${X264_VERSION} \
   x265-dev=${X265_VERSION} \
   libvpx-dev=${VPX_VERSION} \
@@ -108,6 +110,7 @@ RUN mkdir -p /ffmpeg/lib && \
   /usr/lib/liblzma.so.5 \
   /usr/lib/libsrt.so.1.5 \
   /usr/lib/libx264.so \
+  /usr/lib/libx264.so.164 \
   /usr/lib/libx265.so.199 \
   /usr/lib/libnuma.so.1 \
   /usr/lib/libvpx.so.7 \
