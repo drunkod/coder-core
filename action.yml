@@ -33,6 +33,11 @@ runs:
 
         # Print a success message
         echo "The rootfs of $image_name has been extracted to ${output_file}.tar.gz"
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.OUTPUT_FILE }}.tar.gz
+        path: ${{ env.OUTPUT_FILE }}.tar.gz        
       env:
         IMAGE_NAME: ${{ inputs.image_name }}
         OUTPUT_FILE: ${{ inputs.output_file }}
