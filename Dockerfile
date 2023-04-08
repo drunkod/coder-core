@@ -96,7 +96,7 @@ RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   make -j$(nproc) && \
   make install
 
-# export shared ffmpeg libs
+# export shared ffmpeg libraries
 RUN mkdir -p /ffmpeg/lib && \
   cp \
   /usr/lib/libfreetype.so.6 \
@@ -106,8 +106,8 @@ RUN mkdir -p /ffmpeg/lib && \
   /usr/lib/libpng16.so.16 \
   /usr/lib/libxml2.so.2 \
   /usr/lib/liblzma.so.5 \
-  /usr/lib/libsrt.so.1.4 \
-  /usr/lib/libx264.so.163 \
+  /usr/lib/libsrt.so.1.5.1 \
+  /usr/lib/libx264.so \
   /usr/lib/libx265.so.199 \
   /usr/lib/libnuma.so.1 \
   /usr/lib/libvpx.so.7 \
