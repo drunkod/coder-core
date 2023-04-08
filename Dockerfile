@@ -1,5 +1,5 @@
-# FROM jrottenberg/ffmpeg:6.0-alpine
-FROM node:16.3.0-alpine
+FROM jrottenberg/ffmpeg:6.0-alpine
+# FROM node:16.3.0-alpine
 # Installs
 # Installs shell related tools
 RUN apk --no-cache add sudo tini shadow bash \
@@ -10,13 +10,22 @@ RUN apk --no-cache add sudo tini shadow bash \
 # Installs node and npm
 #   npm=9.1.2-r0
 
-ARG USERNAME=coder
-ARG USER_UID=1001
-ARG USER_GID=$USER_UID
+# ARG USERNAME=coder
+# ARG USER_UID=1001
+# ARG USER_GID=$USER_UID
 
 # Add group and user # addgroup $USERNAME -g $USER_GID && \
-RUN adduser -G node -u $USER_UID -s /bin/bash -D $USERNAME && \
-    echo $USERNAME ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/nopasswd
+# RUN adduser -G node -u $USER_UID -s /bin/bash -D $USERNAME && \
+#     echo $USERNAME ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/nopasswd
+    
+ARG USERNAME=coder
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Add group and user
+RUN addgroup $USERNAME -g $USER_GID && \
+    adduser -G $USERNAME -u $USER_UID -s /bin/bash -D $USERNAME && \
+    echo $USERNAME ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/nopasswd    
 
 # Change user
 USER $USERNAME
