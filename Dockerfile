@@ -13,7 +13,7 @@ ARG OPUS_VERSION=1.3.1-r1
 ARG VORBIS_VERSION=1.3.7-r0
 ARG FBDEV_VERSION=0.5.0-r3
 ARG V4L_VERSION=1.22.1-r2
-ARG FFMPEG_VERSION=5.1.2
+ARG FFMPEG_VERSION=5.1.3
 
 ENV PKG_CONFIG_PATH=/usr/lib/pkgconfig \
   SRC=/usr
@@ -106,7 +106,7 @@ RUN mkdir -p /ffmpeg/lib && \
   /usr/lib/libpng16.so.16 \
   /usr/lib/libxml2.so.2 \
   /usr/lib/liblzma.so.5 \
-  /usr/lib/libsrt.so.1.5.1 \
+  /usr/lib/libsrt.so.1.5 \
   /usr/lib/libx264.so \
   /usr/lib/libx265.so.199 \
   /usr/lib/libnuma.so.1 \
