@@ -1,41 +1,44 @@
 FROM jrottenberg/ffmpeg:6.0-alpine
-# FROM node:16.3.0-alpine
-# Installs
-# Installs shell related tools
-RUN apk --no-cache add sudo tini shadow bash \
-# Installs compatibility libs
-  gcompat libc6-compat libgcc libstdc++ \
-# Installs some basic tools
-  git curl socat openssh-client nano unzip brotli zstd xz
-# Installs node and npm
-#   npm=9.1.2-r0
+# FROM martinussuherman/alpine:3.13-arm64v8-glibc
 
-# ARG USERNAME=coder
-# ARG USER_UID=1001
-# ARG USER_GID=$USER_UID
+ENV \
+   # container/su-exec UID \
+   EUID=1001 \
+   # container/su-exec GID \
+   EGID=1001 \
+   # container/su-exec user name \
+   EUSER=vscode \
+   # container/su-exec group name \
+   EGROUP=vscode \
+   # should user shell set to nologin? (yes/no) \
+   ENOLOGIN=no \
+   # container user home dir \
+   EHOME=/home/vscode \
+   # code-server version \
+   VERSION=3.12.0
 
-# Add group and user # addgroup $USERNAME -g $USER_GID && \
-# RUN adduser -G node -u $USER_UID -s /bin/bash -D $USERNAME && \
-#     echo $USERNAME ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/nopasswd
-    
-ARG USERNAME=coder
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+COPY code-server /usr/bin/
+RUN chmod +x /usr/bin/code-server
 
-# Add group and user
-RUN addgroup $USERNAME -g $USER_GID && \
-    adduser -G $USERNAME -u $USER_UID -s /bin/bash -D $USERNAME && \
-    echo $USERNAME ALL=\(ALL\) NOPASSWD:ALL > /etc/sudoers.d/nopasswd    
+# Install dependencies
+RUN \
+   apk --no-cache --update add \
+   bash \
+   curl \
+   git \
+   gnupg \
+   nodejs \
+   openssh-client
 
-# Change user
-USER $USERNAME
-# Configure a nice terminal
-RUN echo "export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '" >> /home/$USERNAME/.bashrc && \
-# Fake poweroff (stops the container from the inside by sending SIGHUP to PID 1)
-    echo "alias poweroff='kill -1 1'" >> /home/$USERNAME/.bashrc
-WORKDIR /home/$USERNAME
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/bin/bash"]
+RUN \
+   wget https://github.com/cdr/code-server/releases/download/v$VERSION/code-server-$VERSION-linux-arm64.tar.gz && \
+   tar x -zf code-server-$VERSION-linux-arm64.tar.gz && \
+   rm code-server-$VERSION-linux-arm64.tar.gz && \
+   rm code-server-$VERSION-linux-arm64/node && \
+   rm code-server-$VERSION-linux-arm64/code-server && \
+   rm code-server-$VERSION-linux-arm64/lib/node && \
+   mv code-server-$VERSION-linux-arm64 /usr/lib/code-server && \
+   sed -i 's/"$ROOT\/lib\/node"/node/g'  /usr/lib/code-server/bin/code-server
 
-# CMD         ["--help"] /usr/local
-# ENTRYPOINT  ["ffmpeg"]
+ENTRYPOINT ["entrypoint-su-exec", "code-server"]
+CMD ["--bind-addr 0.0.0.0:8080"]
