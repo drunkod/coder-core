@@ -172,7 +172,7 @@ COPY --from=builder /usr/bin/ffmpeg /usr/bin/ffmpeg
 COPY --from=builder /ffmpeg/lib/* /usr/lib/
 
 ARG FBDEV_VERSION=0.5.0-r3
-ARG V4L_VERSION=1.22.1-r1
+ARG V4L_VERSION=1.22.1-r2
 
 RUN apk add --no-cache \
   ca-certificates \
