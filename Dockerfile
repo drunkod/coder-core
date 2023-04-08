@@ -31,7 +31,8 @@ EXPOSE 1936/tcp
 EXPOSE 6000/udp
 
 VOLUME ["/core/data", "/core/config"]
-ENTRYPOINT ["/core/bin/run.sh"]
+# ENTRYPOINT ["/core/bin/run.sh"]
+ENTRYPOINT ["entrypoint-su-exec", "/core/bin/run.sh"]
 WORKDIR /core
 
 # ENTRYPOINT ["entrypoint-su-exec", "code-server"]
