@@ -2,7 +2,7 @@ ARG RESTREAMER_UI_IMAGE=datarhei/restreamer-ui:latest
 
 ARG CORE_IMAGE=datarhei/base:alpine-core-latest
 
-ARG FFMPEG_IMAGE=drunkod/coder-core:ffmpeg
+ARG FFMPEG_IMAGE=ghcr.io/drunkod/coder-core:ffmpeg
 
 FROM $RESTREAMER_UI_IMAGE as restreamer-ui
 
