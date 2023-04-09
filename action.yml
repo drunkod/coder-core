@@ -20,7 +20,7 @@ runs:
         output_file=${{ env.OUTPUT_FILE }}
 
         # Create a temporary container from the image
-        container_id=$(docker create $image_name)
+        container_id=$(docker create --platform linux/arm64 --name $image_name)
 
         # Export the container's filesystem to a tar file
         docker export $container_id > $output_file.tar
