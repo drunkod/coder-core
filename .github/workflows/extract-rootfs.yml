@@ -24,7 +24,6 @@ jobs:
           output_file: ${{ env.OUTPUT_FILE }}
           name: ${{ env.OUTPUT_FILE }}.tar.gz
           path: ${{ env.OUTPUT_FILE }}.tar.gz          
-          
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
