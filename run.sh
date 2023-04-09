@@ -1,30 +1,30 @@
 #!/bin/sh
 
-# Start script for the Restreamer bundle
+# Стартовый скрипт для пакета Restreamer
 
-# First run the import program. It will read the db.dir from the config file in order to
-# find an old v1.json. This will be converted to the new db format.
+# Сначала запустите программу импорта. Она прочитает db.dir из файла конфигурации, чтобы
+# найти старый v1.json. Он будет преобразован в новый формат db.
 
 ./bin/import
 if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Run the FFmpeg migration program. In case a FFmpeg 5 binary is present, it will create a
-# backup of the current DB and modify the FFmpeg parameter such that they are compatible
-# with FFmpeg 5.
+# Запустите программу миграции FFmpeg. В случае наличия двоичного файла FFmpeg 5, программа создаст файл
+# резервную копию текущей БД и изменит параметры FFmpeg так, чтобы они были совместимы.
+# с FFmpeg 5.
 
 ./bin/ffmigrate
 if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Create a hint for the admin interface if there is no index.html
+# Создайте подсказку для интерфейса администратора, если отсутствует index.html
 
 if ! [ -f "${CORE_STORAGE_DISK_DIR}/index.html" ]; then
     cp /core/ui-root/index.html /core/ui-root/index_icon.svg ${CORE_STORAGE_DISK_DIR}
 fi
 
-# Now run the core with the possibly converted configuration.
+# Теперь запустите ядро с возможно преобразованной конфигурацией.
 
 ./bin/core
