@@ -11,8 +11,10 @@ jobs:
     steps:
       - name: Set environment variable
         run:  |
-          container_id=${GITHUB_REF#refs/heads/}
-          echo "BRANCH_NAME=$container_id" >> $GITHUB_ENV
+          branch_id=${GITHUB_REF#refs/heads/}
+          echo "BRANCH_NAME=$branch_id" >> $GITHUB_ENV
+          echo "OUTPUT_FILE='${branch_id}-rootfs'" >> $GITHUB_ENV
+          echo "IMAGE_NAME='ghcr.io/drunkod/coder-core:${branch_id}'" >> $GITHUB_ENV
           echo "OUTPUT_FILE='${container_id}-rootfs'" >> $GITHUB_ENV
       - name: 'Checkout'
         uses: actions/checkout@v2
@@ -21,10 +23,8 @@ jobs:
       - name: 'Upload artifact'
         uses: actions/upload-artifact@v2        
         with:
-          image_name: ghcr.io/drunkod/coder-core:${{ env.BRANCH_NAME }}
-          output_file: ${{ env.OUTPUT_FILE }}
           name: ${{ env.OUTPUT_FILE }}.tar.gz
-          path: ${{ env.OUTPUT_FILE }}.tar.gz          
+          path: ${{ env.OUTPUT_FILE }}.tar.gz         
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
