@@ -49,11 +49,3 @@ jobs:
           asset_path: ${{ env.OUTPUT_FILE }}.tar.gz
           asset_name: ${{ env.OUTPUT_FILE }}.tar.gz
           asset_content_type: application/gzip
-          
-      - name: Update release description with download link
-        run: |
-          ASSET_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ steps.create_release.outputs.release_url }}/assets | jq -r '.[] | select(.name=="'${{ env.OUTPUT_FILE }}.tar.gz'") | .id')
-          DOWNLOAD_URL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ steps.create_release.outputs.release_url }}/assets | jq -r '.[] | select(.name=="'${{ env.OUTPUT_FILE }}.tar.gz'") | .browser_download_url')
-          DESCRIPTION=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ steps.create_release.outputs.release_url }} | jq -r '.body')
-          echo "$DESCRIPTION" | sed 's|$|<br><br>Download link: <a href="'$DOWNLOAD_URL'">'$DOWNLOAD_URL'</a>|' > description.txt
-          curl -s -X PATCH -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" ${{ steps.create_release.outputs.release_url }} -d '{"body":"'"$(cat description.txt)"'"}'          
