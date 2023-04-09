@@ -36,6 +36,9 @@ VOLUME ["/core/data", "/core/config"]
 # ENTRYPOINT ["entrypoint-su-exec", "/core/bin/run.sh"]
  WORKDIR /core
  
+COPY core /usr/bin/
+RUN chmod +x /usr/bin/core
+
  ENV \
    # container/su-exec UID \
    EUID=1001 \
