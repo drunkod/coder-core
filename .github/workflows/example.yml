@@ -15,7 +15,6 @@ jobs:
           echo "BRANCH_NAME=$branch_id" >> $GITHUB_ENV
           echo "OUTPUT_FILE='${branch_id}-rootfs'" >> $GITHUB_ENV
           echo "IMAGE_NAME='ghcr.io/drunkod/coder-core:${branch_id}'" >> $GITHUB_ENV
-          echo "OUTPUT_FILE='${container_id}-rootfs'" >> $GITHUB_ENV
       - name: 'Checkout'
         uses: actions/checkout@v2
       - name: 'Extract rootfs' 
