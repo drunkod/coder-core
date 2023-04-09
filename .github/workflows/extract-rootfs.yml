@@ -1,5 +1,5 @@
 # .github/workflows/example.yml
-name: 'Example workflow'
+name: 'Extract rootfs from current branch'
 
 on:
   workflow_dispatch:
@@ -7,22 +7,25 @@ on:
 jobs:
   extract-rootfs:
     runs-on: ubuntu-latest
-    env:
-      OUTPUT_FILE: 'master-rootfs'
+
     steps:
+      - name: Set environment variable
+        run:  |
+          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo "OUTPUT_FILE=$(echo '${BRANCH_NAME}-rootfs')" >> $GITHUB_ENV
       - name: 'Checkout'
         uses: actions/checkout@v2
-      - name: 'Extract rootfs'
+      - name: 'Extract rootfs' 
         uses: ./
         with:
-          image_name: 'ghcr.io/drunkod/coder-core:master'
+          image_name: ghcr.io/drunkod/coder-core:${{ env.BRANCH_NAME }}
           output_file: ${{ env.OUTPUT_FILE }}
           
       - name: 'Upload artifact'
         uses: actions/upload-artifact@v2
         with:
-          name: master-rootfs.tar.gz
-          path: master-rootfs.tar.gz
+          name: ${{ env.OUTPUT_FILE }}.tar.gz
+          path: ${{ env.OUTPUT_FILE }}.tar.gz
           
       - name: Create release
         id: create_release
