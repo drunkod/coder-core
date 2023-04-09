@@ -17,7 +17,7 @@ runs:
         #!/bin/bash
         # Assign the arguments to variables
         image_name=${{ env.IMAGE_NAME }}
-        output_file=${{ env.OUTPUT_FILE }}
+        output_file=ghcr.io/drunkod/coder-core:restreamer@sha256:3786c6c4b9387b7984dcc74ab500f1e08790e0d2957bee6727bca023b3e8e8f3
 
         # Create a temporary container from the image
         container_id=$(docker create $image_name)
