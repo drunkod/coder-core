@@ -15,6 +15,7 @@ jobs:
           echo "BRANCH_NAME=$branch_id" >> $GITHUB_ENV
           echo "OUTPUT_FILE=${branch_id}-rootfs" >> $GITHUB_ENV
           echo "IMAGE_NAME=ghcr.io/drunkod/coder-core:${branch_id}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
       - name: 'Checkout'
         uses: actions/checkout@v2
       - name: 'Extract rootfs' 
@@ -30,8 +31,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v1.0
-          release_name: Release v1.0
+          tag_name: ${{ env.RELEASE_VERSION }}
+          release_name: Release ${{ env.RELEASE_VERSION }}
           body: |
             This is the first release of the project.
           draft: false
@@ -48,3 +49,11 @@ jobs:
           asset_path: ${{ env.OUTPUT_FILE }}.tar.gz
           asset_name: ${{ env.OUTPUT_FILE }}.tar.gz
           asset_content_type: application/gzip
+          
+      - name: Update release description with download link
+        run: |
+          ASSET_ID=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ steps.create_release.outputs.release_url }}/assets | jq -r '.[] | select(.name=="'${{ env.OUTPUT_FILE }}.tar.gz'") | .id')
+          DOWNLOAD_URL=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ steps.create_release.outputs.release_url }}/assets | jq -r '.[] | select(.name=="'${{ env.OUTPUT_FILE }}.tar.gz'") | .browser_download_url')
+          DESCRIPTION=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" ${{ steps.create_release.outputs.release_url }} | jq -r '.body')
+          echo "$DESCRIPTION" | sed 's|$|<br><br>Download link: <a href="'$DOWNLOAD_URL'">'$DOWNLOAD_URL'</a>|' > description.txt
+          curl -s -X PATCH -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github.v3+json" ${{ steps.create_release.outputs.release_url }} -d '{"body":"'"$(cat description.txt)"'"}'          
