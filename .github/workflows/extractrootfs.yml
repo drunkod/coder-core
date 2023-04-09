@@ -7,6 +7,8 @@ on:
 jobs:
   extract-rootfs:
     runs-on: ubuntu-latest
+    env:
+      OUTPUT_FILE: 'master-rootfs'
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v2
@@ -14,7 +16,7 @@ jobs:
         uses: ./
         with:
           image_name: 'ghcr.io/drunkod/coder-core:master'
-          output_file: 'master-rootfs'
+          output_file: ${{ env.OUTPUT_FILE }}
           
       - name: 'Upload artifact'
         uses: actions/upload-artifact@v2
@@ -40,6 +42,7 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT_FILE: ${{ env.OUTPUT_FILE }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ env.OUTPUT_FILE }}.tar.gz
