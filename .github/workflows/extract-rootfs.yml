@@ -11,8 +11,9 @@ jobs:
     steps:
       - name: Set environment variable
         run:  |
-          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-          echo "OUTPUT_FILE=$(echo ${BRANCH_NAME}'-rootfs')" >> $GITHUB_ENV
+          container_id=${GITHUB_REF#refs/heads/}
+          echo "BRANCH_NAME=$container_id" >> $GITHUB_ENV
+          echo "OUTPUT_FILE='${container_id}-rootfs'" >> $GITHUB_ENV
       - name: 'Checkout'
         uses: actions/checkout@v2
       - name: 'Extract rootfs' 
