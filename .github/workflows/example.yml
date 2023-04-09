@@ -11,9 +11,11 @@ jobs:
     steps:
       - name: Set environment variable
         run:  |
-          container_id=${GITHUB_REF#refs/heads/}
-          echo "BRANCH_NAME=$container_id" >> $GITHUB_ENV
-          echo "OUTPUT_FILE='${container_id}-rootfs'" >> $GITHUB_ENV
+          branch_id=${GITHUB_REF#refs/heads/}
+          echo "BRANCH_NAME=$branch_id" >> $GITHUB_ENV
+          echo "OUTPUT_FILE=${branch_id}-rootfs" >> $GITHUB_ENV
+          echo "IMAGE_NAME=ghcr.io/drunkod/coder-core:${branch_id}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
       - name: 'Checkout'
         uses: actions/checkout@v2
       - name: 'Extract rootfs' 
@@ -21,18 +23,16 @@ jobs:
       - name: 'Upload artifact'
         uses: actions/upload-artifact@v2        
         with:
-          image_name: ghcr.io/drunkod/coder-core:${{ env.BRANCH_NAME }}
-          output_file: ${{ env.OUTPUT_FILE }}
           name: ${{ env.OUTPUT_FILE }}.tar.gz
-          path: ${{ env.OUTPUT_FILE }}.tar.gz          
+          path: ${{ env.OUTPUT_FILE }}.tar.gz         
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v1.0
-          release_name: Release v1.0
+          tag_name: ${{ env.RELEASE_VERSION }}
+          release_name: Release ${{ env.RELEASE_VERSION }}
           body: |
             This is the first release of the project.
           draft: false
