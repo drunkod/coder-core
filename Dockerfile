@@ -38,6 +38,7 @@ VOLUME ["/core/data", "/core/config"]
  
 COPY core /usr/bin/
 RUN chmod +x /usr/bin/core
+RUN chmod +x /core/bin/run.sh
 
  ENV \
    # container/su-exec UID \
