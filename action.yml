@@ -1,5 +1,5 @@
 # action.yml
-name: 'Extract rootfs'
+name: 'Extract linux/arm64 rootfs'
 description: 'Extracts the root filesystem of a Docker image and saves it as a gzip file'
 inputs:
   image_name:
@@ -16,11 +16,11 @@ runs:
       run: |
         #!/bin/bash
         # Assign the arguments to variables
-        image_name=ghcr.io/drunkod/coder-core:restreamer@sha256:b45ac3460a20e9e5db10ab175f56e84efd885da06513bcb6b5f422307d62aaa5
+        image_name=${{ env.IMAGE_NAME }}
         output_file=${{ env.OUTPUT_FILE }}
 
         # Create a temporary container from the image
-        container_id=$(docker create $image_name)
+        container_id=$(docker create --platform linux/arm64 --name $image_name)
 
         # Export the container's filesystem to a tar file
         docker export $container_id > $output_file.tar
