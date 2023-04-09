@@ -16,7 +16,7 @@ runs:
       run: |
         #!/bin/bash
         # Assign the arguments to variables
-        image_name=ghcr.io/drunkod/coder-core:restreamer@sha256:d5921746895318b05b471772af531905c70dde91ecf5c93befd3d5bb322cef62
+        image_name=ghcr.io/drunkod/coder-core:restreamer@sha256:b45ac3460a20e9e5db10ab175f56e84efd885da06513bcb6b5f422307d62aaa5
         output_file=${{ env.OUTPUT_FILE }}
 
         # Create a temporary container from the image
