@@ -1,0 +1,53 @@
+# .github/workflows/example.yml
+name: 'Example workflow'
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  extract-rootfs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set environment variable
+        run:  |
+          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo "OUTPUT_FILE=$(echo '${BRANCH_NAME}-rootfs')" >> $GITHUB_ENV
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+      - name: 'Extract rootfs' 
+        uses: ./
+        with:
+          image_name: ghcr.io/drunkod/coder-core:${{ env.BRANCH_NAME }}
+          output_file: ${{ env.OUTPUT_FILE }}
+          
+      - name: 'Upload artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.OUTPUT_FILE }}.tar.gz
+          path: ${{ env.OUTPUT_FILE }}.tar.gz
+          
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.0
+          release_name: Release v1.0
+          body: |
+            This is the first release of the project.
+          draft: false
+          prerelease: false
+
+      - name: Upload release asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT_FILE: ${{ env.OUTPUT_FILE }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.OUTPUT_FILE }}.tar.gz
+          asset_name: ${{ env.OUTPUT_FILE }}.tar.gz
+          asset_content_type: application/gzip
