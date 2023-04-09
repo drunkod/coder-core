@@ -31,9 +31,26 @@ EXPOSE 1936/tcp
 EXPOSE 6000/udp
 
 VOLUME ["/core/data", "/core/config"]
+
 # ENTRYPOINT ["/core/bin/run.sh"]
 # ENTRYPOINT ["entrypoint-su-exec", "/core/bin/run.sh"]
-# WORKDIR /core
+ WORKDIR /core
+ 
+ ENV \
+   # container/su-exec UID \
+   EUID=1001 \
+   # container/su-exec GID \
+   EGID=1001 \
+   # container/su-exec user name \
+   EUSER=core \
+   # container/su-exec group name \
+   EGROUP=core \
+   # should user shell set to nologin? (yes/no) \
+   ENOLOGIN=no \
+   # container user home dir \
+   EHOME=/core \
+   # code-server version \
+   VERSION=3.12.0
 
  ENTRYPOINT ["entrypoint-su-exec", "/core/bin/run.sh"]
  CMD ["--bind-addr 0.0.0.0:8080"]
