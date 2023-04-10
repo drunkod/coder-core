@@ -1,5 +1,5 @@
 # .github/workflows/example.yml
-name: 'Extract rootfs from current branch'
+name: 'Extract rootfs from ff_jrotte branch'
 
 on:
   workflow_dispatch:
