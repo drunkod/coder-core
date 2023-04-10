@@ -93,7 +93,8 @@ RUN     buildDeps="autoconf \
                    tar \
                    xcb-proto \
                    yasm \
-                   zlib-dev" && \
+                   zlib-dev \
+                   x265-dev" && \
         apk add --no-cache --update ${buildDeps}
 ## libvmaf https://github.com/Netflix/vmaf
 RUN \
@@ -138,18 +139,18 @@ RUN \
         make install && \
         rm -rf ${DIR}
 ### x265 http://x265.org/
-RUN \
-        DIR=/tmp/x265 && \
-        mkdir -p ${DIR} && \
-        cd ${DIR} && \
-        curl -sL https://github.com/videolan/x265/archive/refs/tags/${X265_VERSION}.tar.gz | \
-        tar -zx && \
-        cd x265-${X265_VERSION}/build/linux && \
-        sed -i "/-DEXTRA_LIB/ s/$/ -DCMAKE_INSTALL_PREFIX=\${PREFIX}/" multilib.sh && \
-        sed -i "/^cmake/ s/$/ -DENABLE_CLI=OFF/" multilib.sh && \
-        ./multilib.sh && \
-        make -C 8bit install && \
-        rm -rf ${DIR}
+# RUN \
+#         DIR=/tmp/x265 && \
+#         mkdir -p ${DIR} && \
+#         cd ${DIR} && \
+#         curl -sL https://github.com/videolan/x265/archive/refs/tags/${X265_VERSION}.tar.gz | \
+#         tar -zx && \
+#         cd x265-${X265_VERSION}/build/linux && \
+#         sed -i "/-DEXTRA_LIB/ s/$/ -DCMAKE_INSTALL_PREFIX=\${PREFIX}/" multilib.sh && \
+#         sed -i "/^cmake/ s/$/ -DENABLE_CLI=OFF/" multilib.sh && \
+#         ./multilib.sh && \
+#         make -C 8bit install && \
+#         rm -rf ${DIR}
 ### libogg https://www.xiph.org/ogg/
 RUN \
         DIR=/tmp/ogg && \
