@@ -1,6 +1,6 @@
 ARG RESTREAMER_UI_IMAGE=datarhei/restreamer-ui:latest
 
-ARG CORE_IMAGE=datarhei/base:alpine-core-latest
+ARG CORE_IMAGE=ghcr.io/drunkod/media-core:alpine-core-latest
 
 ARG FFMPEG_IMAGE=ghcr.io/drunkod/coder-core:ffmpeg
 
