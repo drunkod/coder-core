@@ -94,7 +94,7 @@ RUN     buildDeps="autoconf \
                    xcb-proto \
                    yasm \
                    zlib-dev \
-                   x265-dev
+                   x265-dev \
                    libtheora-dev" && \
         apk add --no-cache --update ${buildDeps}
 ## libvmaf https://github.com/Netflix/vmaf
