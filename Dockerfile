@@ -94,7 +94,8 @@ RUN     buildDeps="autoconf \
                    xcb-proto \
                    yasm \
                    zlib-dev \
-                   x265-dev" && \
+                   x265-dev
+                   libtheora-dev" && \
         apk add --no-cache --update ${buildDeps}
 ## libvmaf https://github.com/Netflix/vmaf
 RUN \
@@ -184,18 +185,6 @@ RUN \
         curl -sLO http://downloads.xiph.org/releases/vorbis/libvorbis-${VORBIS_VERSION}.tar.gz && \
         echo ${VORBIS_SHA256SUM} | sha256sum --check && \
         tar -zx --strip-components=1 -f libvorbis-${VORBIS_VERSION}.tar.gz && \
-        ./configure --prefix="${PREFIX}" --with-ogg="${PREFIX}" --enable-shared && \
-        make && \
-        make install && \
-        rm -rf ${DIR}
-### libtheora http://www.theora.org/
-RUN \
-        DIR=/tmp/theora && \
-        mkdir -p ${DIR} && \
-        cd ${DIR} && \
-        curl -sLO http://downloads.xiph.org/releases/theora/libtheora-${THEORA_VERSION}.tar.gz && \
-        echo ${THEORA_SHA256SUM} | sha256sum --check && \
-        tar -zx --strip-components=1 -f libtheora-${THEORA_VERSION}.tar.gz && \
         ./configure --prefix="${PREFIX}" --with-ogg="${PREFIX}" --enable-shared && \
         make && \
         make install && \
