@@ -128,27 +128,6 @@ FROM $BUILD_IMAGE as final
 # Alpine Linux or Minimal Alpine Linux image with
 # glibc based image that bundles tzdata, su-exec, and some useful entrypoint scripts.
 # From https://github.com/martinussuherman/alpine
-ENV \
-   # container/su-exec UID \
-   EUID=1001 \
-   # container/su-exec GID \
-   EGID=1001 \
-   # container/su-exec user name \
-   EUSER=docker-user \
-   # container/su-exec group name \
-   EGROUP=docker-group \
-   # container user home dir \
-   EHOME= \
-   # should user created/updated to use nologin shell? (yes/no) \
-   ENOLOGIN=yes \
-   # should user home dir get chown'ed? (yes/no) \
-   ECHOWNHOME=no \
-   # additional directories to create + chown (space separated) \
-   ECHOWNDIRS= \
-   # additional files to create + chown (space separated) \
-   ECHOWNFILES= \
-   # container timezone \
-   TZ=UTC
 
 # Install shadow (for usermod and groupmod) and su-exec
 RUN \
