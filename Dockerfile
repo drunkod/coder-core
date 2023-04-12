@@ -95,7 +95,8 @@ RUN     buildDeps="autoconf \
                    yasm \
                    zlib-dev \
                    x265-dev \
-                   libtheora-dev" && \
+                   libtheora-dev \
+                   openjpeg-dev" && \
         apk add --no-cache --update ${buildDeps}
 ## libvmaf https://github.com/Netflix/vmaf
 RUN \
@@ -249,16 +250,16 @@ RUN \
         make install && \
         rm -rf ${DIR}
 ## openjpeg https://github.com/uclouvain/openjpeg
-RUN \
-        DIR=/tmp/openjpeg && \
-        mkdir -p ${DIR} && \
-        cd ${DIR} && \
-        curl -sL https://github.com/uclouvain/openjpeg/archive/v${OPENJPEG_VERSION}.tar.gz | \
-        tar -zx --strip-components=1 && \
-        cmake -DBUILD_THIRDPARTY:BOOL=ON -DCMAKE_INSTALL_PREFIX="${PREFIX}" . && \
-        make && \
-        make install && \
-        rm -rf ${DIR}
+# RUN \
+#         DIR=/tmp/openjpeg && \
+#         mkdir -p ${DIR} && \
+#         cd ${DIR} && \
+#         curl -sL https://github.com/uclouvain/openjpeg/archive/v${OPENJPEG_VERSION}.tar.gz | \
+#         tar -zx --strip-components=1 && \
+#         cmake -DBUILD_THIRDPARTY:BOOL=ON -DCMAKE_INSTALL_PREFIX="${PREFIX}" . && \
+#         make && \
+#         make install && \
+#         rm -rf ${DIR}
 ## freetype https://www.freetype.org/
 RUN  \
         DIR=/tmp/freetype && \
