@@ -32,7 +32,7 @@ EXPOSE 6000/udp
 
 VOLUME ["/core/data", "/core/config"]
 
-WORKDIR /core
+
  
 COPY core /usr/bin/
 RUN chmod +x /usr/bin/core
@@ -48,12 +48,27 @@ ENV \
    EUSER=core \
    # container/su-exec group name \
    EGROUP=core \
-   # should user shell set to nologin? (yes/no) \
+   # should user shell set to nologin? (yes\no) \
    ENOLOGIN=no \
    # container user home dir \
    EHOME=/core \
    # code-server version \
    VERSION=3.12.0
 
- ENTRYPOINT ["entrypoint-su-exec", "/core/bin/run.sh"]
- CMD ["--bind-addr 0.0.0.0:8080"]
+RUN /usr/bin/set-user-group-home
+# save env in user 
+ENV ENV="/core/.ashrc"
+
+# RUN echo "echo 'Hello, world!'" > "$ENV"
+RUN echo "export CORE_CONFIGFILE=$CORE_CONFIGFILE \n \
+    export CORE_DB_DIR=$CORE_DB_DIR \n \
+    export CORE_ROUTER_UI_PATH=$CORE_ROUTER_UI_PATH \n \
+    export CORE_STORAGE_DISK_DIR=$CORE_STORAGE_DISK_DIR \n \
+    export CORE_STORAGE_DISK_DIR2=$CORE_STORAGE_DISK_DIR" >> $ENV
+
+
+#  ENTRYPOINT ["entrypoint-su-exec", "/core/bin/run.sh"]
+# ENTRYPOINT ["/bin/sh"]
+ ENTRYPOINT ["/core/bin/run.sh"]
+WORKDIR /core
+#  CMD ["--bind-addr 0.0.0.0:8080"]
