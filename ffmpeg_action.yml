@@ -1,0 +1,35 @@
+# action.yml
+name: 'Extract ffmpeg linux/arm64 rootfs'
+description: 'Extracts the root filesystem of a Docker image and saves it as a gzip file'
+inputs:
+  image_name:
+    description: 'The name of the Docker image to extract'
+    required: true
+  output_file:
+    description: 'The name of the output file without extension'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Run extract-rootfs.sh'
+      shell: bash
+      run: |
+        #!/bin/bash
+        # Assign the arguments to variables
+        image_name=${{ env.IMAGE_NAME }}
+        output_file=${{ env.OUTPUT_FILE }}
+
+        # Create a temporary container from the image
+        container_id=$(docker create --platform linux/arm64 $image_name)
+
+        # Export the container's filesystem to a tar file
+        docker export $container_id > $output_file.tar
+
+        # Remove the temporary container
+        docker rm $container_id
+
+        # Compress the tar file into gzip format
+        gzip -f $output_file.tar
+
+        # Print a success message
+        echo "The rootfs of $image_name has been extracted to ${output_file}.tar.gz"
