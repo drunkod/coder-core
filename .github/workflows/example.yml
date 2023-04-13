@@ -35,7 +35,8 @@ jobs:
           release_name: ${{ env.BRANCH_NAME }} Release ${{ env.RELEASE_VERSION }}
           body: |
             This is the ${{ env.RELEASE_VERSION }} release of the ${{ env.BRANCH_NAME }}.
-            `( export ROOTFS_URL="https://github.com/drunkod/coder-core/releases/download/${{ env.RELEASE_VERSION }}/${{ env.OUTPUT_FILE }}.tar.gz" ; S=install-linuxcontainers.sh ; "$TERMSH" copy -f -fu "https://raw.githubusercontent.com/drunkod/AnotherTerm-scripts/master/$S" -tp . && chmod 755 $S && sh ./$S -a alpine 3.17 )`
+            `echo "127.0.0.1 localhost" >> /etc/hosts`
+            `( export REG_USER="core"; export FAV_SHELL="/bin/ash"; export ROOTFS_URL="https://github.com/drunkod/coder-core/releases/download/${{ env.RELEASE_VERSION }}/${{ env.OUTPUT_FILE }}.tar.gz" ; S=install-linuxcontainers.sh ; "$TERMSH" copy -f -fu "https://raw.githubusercontent.com/drunkod/AnotherTerm-scripts/master/$S" -tp . && chmod 755 $S && sh ./$S -a alpine 3.17 )`
           draft: false
           prerelease: false
 
