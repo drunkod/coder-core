@@ -57,6 +57,8 @@ ENV \
 
 RUN /usr/bin/set-user-group-home
 # save env in user 
+USER core
+# save env in user 
 ENV ENV="/core/.ashrc"
 
 # RUN echo "echo 'Hello, world!'" > "$ENV"
