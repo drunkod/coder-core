@@ -39,6 +39,13 @@ RUN chmod +x /usr/bin/core
 RUN chmod +x /core/bin/run.sh
 RUN chmod -R +x /core
 
+RUN mkdir -p /etc/skel/
+
+RUN echo "export CORE_CONFIGFILE=$CORE_CONFIGFILE \
+    export CORE_DB_DIR=$CORE_DB_DIR \
+    export CORE_ROUTER_UI_PATH=$CORE_ROUTER_UI_PATH \
+    export CORE_STORAGE_DISK_DIR=$CORE_STORAGE_DISK_DIR \
+    export CORE_STORAGE_DISK_DIR2=$CORE_STORAGE_DISK_DIR" >> /etc/skel/.ashrc
 ENV \
    # container/su-exec UID \
    EUID=1001 \
@@ -51,26 +58,20 @@ ENV \
    # should user shell set to nologin? (yes\no) \
    ENOLOGIN=no \
    # container user home dir \
-   EHOME=/core \
+   EHOME=/home/core \
    # code-server version \
    VERSION=3.12.0
 
 RUN /usr/bin/set-user-group-home
 # save env in user 
 USER core
-# save env in user 
-ENV ENV="/core/.ashrc"
+# # save env in user 
+ENV ENV="/home/core/.ashrc"
 
-# RUN echo "echo 'Hello, world!'" > "$ENV"
-RUN echo "export CORE_CONFIGFILE=$CORE_CONFIGFILE \n \
-    export CORE_DB_DIR=$CORE_DB_DIR \n \
-    export CORE_ROUTER_UI_PATH=$CORE_ROUTER_UI_PATH \n \
-    export CORE_STORAGE_DISK_DIR=$CORE_STORAGE_DISK_DIR \n \
-    export CORE_STORAGE_DISK_DIR2=$CORE_STORAGE_DISK_DIR" >> $ENV
-
+RUN echo "echo 'Hello, world!'" >> "$ENV"
 
 #  ENTRYPOINT ["entrypoint-su-exec", "/core/bin/run.sh"]
-# ENTRYPOINT ["/bin/sh"]
- ENTRYPOINT ["/core/bin/run.sh"]
-WORKDIR /core
+ENTRYPOINT ["/bin/ash"]
+#  ENTRYPOINT ["/core/bin/run.sh"]
+WORKDIR /home/core
 #  CMD ["--bind-addr 0.0.0.0:8080"]
