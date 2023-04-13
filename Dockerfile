@@ -46,6 +46,10 @@ RUN echo "export CORE_CONFIGFILE=$CORE_CONFIGFILE \
     export CORE_ROUTER_UI_PATH=$CORE_ROUTER_UI_PATH \
     export CORE_STORAGE_DISK_DIR=$CORE_STORAGE_DISK_DIR \
     export CORE_STORAGE_DISK_DIR2=$CORE_STORAGE_DISK_DIR" >> /etc/skel/.ashrc
+RUN echo "echo 'Hello, world! /etc/skel/.ashrc'" >> /etc/skel/.ashrc
+RUN echo "echo 'Hello, world! /etc/skel/.bashrc'" >> /etc/skel/.bashrc 
+RUN echo "echo 'Hello, world! /etc/skel/.profile'" >> /etc/skel/.profile
+RUN echo "echo 'Hello, world! /etc/profile'" >> /etc/profile
 ENV \
    # container/su-exec UID \
    EUID=1001 \
@@ -67,11 +71,12 @@ RUN /usr/bin/set-user-group-home
 USER core
 # # save env in user 
 ENV ENV="/home/core/.ashrc"
-
-RUN echo "echo 'Hello, world!'" >> "$ENV"
-
+ENV ENV_BSH="/home/core/.bashrc"
+RUN echo "echo 'Hello, world! /home/core/.ashrc'" >> "$ENV"
+RUN echo "echo 'Hello, world! /home/core/.bashrc'" >> "$ENV_BSH"
+RUN echo "echo 'Hello, world! /home/core/.profile'" >> /home/core/.profile
 #  ENTRYPOINT ["entrypoint-su-exec", "/core/bin/run.sh"]
-ENTRYPOINT ["/bin/ash"]
+ENTRYPOINT ["/bin/sh"]
 #  ENTRYPOINT ["/core/bin/run.sh"]
 WORKDIR /home/core
 #  CMD ["--bind-addr 0.0.0.0:8080"]
