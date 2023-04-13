@@ -37,7 +37,7 @@ VOLUME ["/core/data", "/core/config"]
 COPY core /usr/bin/
 RUN chmod +x /usr/bin/core
 RUN chmod +x /core/bin/run.sh
-RUN chmod -R +x /core
+RUN chmod -R 775 /core
 
 RUN mkdir -p /etc/skel/
 
@@ -45,30 +45,13 @@ RUN echo "export CORE_CONFIGFILE=$CORE_CONFIGFILE \
     export CORE_DB_DIR=$CORE_DB_DIR \
     export CORE_ROUTER_UI_PATH=$CORE_ROUTER_UI_PATH \
     export CORE_STORAGE_DISK_DIR=$CORE_STORAGE_DISK_DIR \
-    export CORE_STORAGE_DISK_DIR2=$CORE_STORAGE_DISK_DIR" >> /etc/skel/.ashrc
+    export CORE_STORAGE_DISK_DIR2=$CORE_STORAGE_DISK_DIR" >> /etc/profile
 RUN echo "echo 'Hello, world! /etc/skel/.ashrc'" >> /etc/skel/.ashrc
 RUN echo "echo 'Hello, world! /etc/skel/.bashrc'" >> /etc/skel/.bashrc 
 RUN echo "echo 'Hello, world! /etc/skel/.profile'" >> /etc/skel/.profile
 RUN echo "echo 'Hello, world! /etc/profile'" >> /etc/profile
-ENV \
-   # container/su-exec UID \
-   EUID=1001 \
-   # container/su-exec GID \
-   EGID=1001 \
-   # container/su-exec user name \
-   EUSER=core \
-   # container/su-exec group name \
-   EGROUP=core \
-   # should user shell set to nologin? (yes\no) \
-   ENOLOGIN=no \
-   # container user home dir \
-   EHOME=/home/core \
-   # code-server version \
-   VERSION=3.12.0
 
-RUN /usr/bin/set-user-group-home
-# save env in user 
-USER core
+RUN mkdir -p /home/core/
 # # save env in user 
 ENV ENV="/home/core/.ashrc"
 ENV ENV_BSH="/home/core/.bashrc"
