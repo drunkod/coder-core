@@ -25,5 +25,5 @@ RUN    sudo /usr/bin/nimble_regutil -u $WMSPANEL_ACCOUNT -p $WMSPANEL_PASS --tra
 
 RUN    sudo echo "management_listen_interfaces = *" >> /etc/nimble/nimble.conf 
 
-#EXPOSE 8081 1935 554 4444/udp
+EXPOSE 8081 1935 554 4444/udp
 ENTRYPOINT    ["/usr/bin/nimble", "--conf-dir=/etc/nimble", "--log-dir=/var/log/nimble","--pidfile=/var/run/nimble/nimble.pid"]
