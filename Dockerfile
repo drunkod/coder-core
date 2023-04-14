@@ -11,11 +11,12 @@ RUN	apt-get install wget gnupg sudo vim less -y
 ENV	TZ=Asia/Vladivostok
 RUN	ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN	sudo bash -c 'echo -e "deb http://nimblestreamer.com/ubuntu jammy/" > /etc/apt/sources.list.d/nimble.list'
-RUN	wget -q -O - http://nimblestreamer.com/gpg.key | sudo tee /etc/apt/trusted.gpg.d/nimble.asc
-RUN	apt-get update -y
-
-RUN	apt-get install nimble nimble-srt-1.5 -y
+RUN    wget -q -O - http://nimblestreamer.com/gpg.key | sudo apt-key add -
+RUN    apt-get update -y
+RUN    echo "deb http://nimblestreamer.com/raspbian/ buster/" >> /etc/apt/sources.list
+RUN    echo "deb http://us-east-2.ec2.ports.ubuntu.com/ubuntu-ports/ bionic universe" >> /etc/apt/sources.list
+RUN    apt-get update -y
+RUN    apt-get install nimble nimble-srt nimble-transcoder -y
 
 
 # Fill in variables for Nimble Server name, WMSPanel account and password below
