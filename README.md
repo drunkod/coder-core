@@ -1,5 +1,7 @@
 https://github.com/yoshz/puppet-nimblestreamer
+
 https://github.com/mittiaj/docker-nimble-wms-panel-debian/blob/master/Dockerfile
+
 без панели https://github.com/mittiaj/docker-nimble-debian
 
 # coder-core
