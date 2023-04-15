@@ -4,6 +4,8 @@ https://github.com/mittiaj/docker-nimble-wms-panel-debian/blob/master/Dockerfile
 
 без панели https://github.com/mittiaj/docker-nimble-debian
 
+https://github.com/fpm-git/ansible-nimble-streamer
+
 # coder-core
 ---
 This is my opinionated attempt to build a "lightweight" docker image powerful enough to run [vscode remote containers](https://code.visualstudio.com/docs/remote/containers-tutorial) or to be used as a base image to create [docker container GitHub Actions](https://docs.github.com/en/actions/creating-actions/creating-a-docker-container-action). 
